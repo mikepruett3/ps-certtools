@@ -4,20 +4,19 @@ function Convert-PFXtoPEM {
         Convert/Extract a PFX formatted certificate bundle to PEM formatted.
     .DESCRIPTION
         Function that will extract the appropriate PEM certificates from a PFX bundle.
-    .NOTES
-        File Name: Convert-PFXtoPEM.ps1
-        Author: Mike Pruett
-        Date: August 24th, 2021
-        Requires: OpenSSL
-        openssl must be available in the current shell path.
-    .LINK
-        FFmpeg - https://www.openssl.org
     .PARAMETER Path
         PFX formatted file to convert/extract, encapsulated in "quotes"
     .PARAMETER Passphrase
         Plain-Text Password for the PFX formatted file to convert/extract, encapsulated in "quotes".
     .EXAMPLE
         > Convert-PFXtoPEM -Path "C:\temp\mycerts.pfx" -Passphrase "MyPassword"
+    .NOTES
+        Author: Mike Pruett
+        Date: August 24th, 2021
+        Updated: August 30th, 2024
+
+        Requires: OpenSSL
+        openssl must be available in the current shell path.
     #>
     [CmdletBinding()]
     param (

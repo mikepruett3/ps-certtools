@@ -6,9 +6,6 @@ function Import-PFX {
     .DESCRIPTION
         Function that copies over a PFX formatted certificate bundle to a remote host,
         then imports it into the local Certificate store
-    .NOTES
-        Remote host needs to be running at least Windows Server 2012, or have the
-        Import-PfxCertificate command avaliable
     .PARAMETER Server
         The remote server to establish a remote PSSession.
     .PARAMETER Credential
@@ -32,6 +29,9 @@ function Import-PFX {
         Author: Mike Pruett
         Date: Feburary 3rd, 2022
         Updated: August 22st, 2024
+
+        Remote host needs to be running at least Windows Server 2012, or have the
+        Import-PfxCertificate command avaliable
     #>
     [CmdletBinding()]
     param (
