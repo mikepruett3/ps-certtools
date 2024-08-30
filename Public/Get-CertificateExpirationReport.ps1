@@ -30,11 +30,10 @@ function Get-CertificateExpirationReport {
     )
 
     begin {
-        Write-Verbose "Creating an Variables..."
-        # Create ExpirationDate Variable
+        Write-Verbose "Create ExpirationDate Variable"
         $ExpirationDate = (Get-Date).AddDays($Days)
 
-        # Create HTML Email Header
+        Write-Verbose "Create HTML Email Header"
         $Header = @"
         <style>
         TABLE {border-width: 1px; border-style: solid; border-color: black; border-collapse: collapse;}
@@ -53,7 +52,7 @@ function Get-CertificateExpirationReport {
     }
 
     process {
-        # Query local Certificate Store for expiring certificates
+        Write-Verbose "Query local Certificate Store for expiring certificates"
         try {
             $Report = Get-ChildItem CERT:LocalMachine\My | `
             Where-Object { $_.NotAfter -gt (Get-Date) -and $_.NotAfter -lt $ExpirationDate } | `
@@ -64,7 +63,8 @@ function Get-CertificateExpirationReport {
             Write-Error "Unable to collect report output!"
             Break
         }
-        # Email Report
+
+        Write-Verbose "Email Report"
         Send-MailMessage `
             -From "Daily SSL Check <dailysslcheck@example.com>" `
             -To "$Recipient"`
@@ -76,8 +76,7 @@ function Get-CertificateExpirationReport {
     }
 
     end {
-        # Cleanup Variables
-        Write-Verbose "Cleaning up variables..."
+        Write-Verbose "Cleaning up used Variables"
         Remove-Variable -Name "Days" -ErrorAction SilentlyContinue
         Remove-Variable -Name "Recipient" -ErrorAction SilentlyContinue
         Remove-Variable -Name "ExpirationDate" -ErrorAction SilentlyContinue
