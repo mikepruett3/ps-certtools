@@ -29,7 +29,7 @@ function Search-ExpiredCerts {
     )
 
     begin {
-        Write-Verbose "Ingesting Credentials of $Credential into variable"
+        Write-Verbose "Ingesting Credentials of $Credentials into variable"
         $Creds = Get-Credential("$Credentials")
 
         # Test Server Connectivity
@@ -44,7 +44,7 @@ function Search-ExpiredCerts {
 
     process {
         # -HideComputerName
-        Write-Verbose "Query the local Certificate store for Expired Certificates"
+        Write-Verbose "Query the local Certificate store on $Server for Expired Certificates"
         Return Invoke-Command -Session $Session -ScriptBlock {
             Return Get-ChildItem -Path Cert:\LocalMachine\My -Recurse -ExpiringInDays 0 | `
                    Select-Object *,@{N="CommonName";E={$_.Subject.Split(',')[0]}}
