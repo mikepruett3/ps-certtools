@@ -58,7 +58,7 @@ function Convert-PFXtoPEM {
             Break
         }
         Write-Verbose "Extracting CA Certificates from $Path, and writing to $Path.chain.cer"
-        try { openssl pkcs12 -in "$Path" -legacy -cacerts -nokeys -chain -passin pass:"$Passphrase" -out "$FileName.chain.cer" }
+        try { openssl pkcs12 -in "$Path" -legacy -cacerts -nokeys -passin pass:"$Passphrase" -out "$FileName.chain.cer" }
         catch {
             Write-Error "Unable to extract CA Certificates from file $Path!"
             Break
