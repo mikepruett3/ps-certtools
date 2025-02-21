@@ -13,18 +13,18 @@ function Convert-PFXtoPEM {
     .NOTES
         Author: Mike Pruett
         Date: August 24th, 2021
-        Updated: August 30th, 2024
+        Updated: February 21st, 2025
 
         Requires: OpenSSL
-        openssl must be available in the current shell path.
+        openssl must be available in the current shell path, and version equal to 3.4 or greater!
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        [ValidateScript({Test-Path $_ -PathType 'Leaf'})]
+        [Parameter(Mandatory=$True,ValueFromPipeline=$True)]
+        [ValidateScript({Test-Path -Path $_ -PathType 'Leaf'})]
         [string]
         $Path,
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [Parameter(Mandatory=$True,ValueFromPipeline=$True)]
         [string]
         $Passphrase
     )
@@ -37,6 +37,12 @@ function Convert-PFXtoPEM {
             Break
         }
 
+        Write-Verbose "Check if openssl version is at least v3.4..."
+        if ( ! ( (Get-Command -Name "openssl.exe" ).FileVersionInfo.ProductVersion -ge 3.4 ) ) {
+            Write-Error "openssl version too old!`nDownload from https://wiki.openssl.org/index.php/Binaries, and place in path!"
+            #Break
+        }
+
         # Collect Filename
         $FileName = (Get-ChildItem $Path).BaseName
     }
@@ -45,31 +51,45 @@ function Convert-PFXtoPEM {
         # Convert/Extract the PFX file
         # Added "-legacy" option to support newer OpenSSL Versions - https://stackoverflow.com/questions/72598983/curl-openssl-error-error0308010cdigital-envelope-routinesunsupported
         Write-Verbose "Extracting Private Key from $Path, and writing to $Path.key"
-        try { openssl pkcs12 -in "$Path" -legacy -nocerts -nodes -passin pass:"$Passphrase" | openssl pkcs8 -nocrypt -out "$FileName.key" }
+        try {
+            openssl pkcs12 -in "$Path" -legacy -nocerts -nodes -passin pass:"$Passphrase" | openssl pkcs8 -nocrypt -out "$FileName.key"
+        }
         catch {
             Write-Error "Unable to extract Private key from file $Path!"
             Break
         }
+
         Write-Verbose "Extracting Certificate from $Path, and writing to $Path.crt"
-        try { openssl pkcs12 -in "$Path" -legacy -clcerts -nokeys -passin pass:"$Passphrase" | openssl x509 -out "$FileName.crt" }
+        try {
+            openssl pkcs12 -in "$Path" -legacy -clcerts -nokeys -passin pass:"$Passphrase" | openssl x509 -out "$FileName.crt"
+        }
         catch {
             Write-Error "Unable to extract Certificate from file $Path!"
             Break
         }
+
         Write-Verbose "Extracting CA Certificates from $Path, and writing to $Path.chain.cer"
-        try { openssl pkcs12 -in "$Path" -legacy -cacerts -nokeys -passin pass:"$Passphrase" -out "$FileName.chain.cer" }
+        try {
+            openssl pkcs12 -in "$Path" -legacy -cacerts -nokeys -passin pass:"$Passphrase" -out "$FileName.chain.cer"
+        }
         catch {
             Write-Error "Unable to extract CA Certificates from file $Path!"
             Break
         }
+
         Write-Verbose "Extracting Certificate from $Path, and writing to $Path.der"
-        try { openssl pkcs12 -in "$Path" -legacy -clcerts -nokeys -passin pass:"$Passphrase" | openssl x509 -outform der -out "$FileName.der" }
+        try {
+            openssl pkcs12 -in "$Path" -legacy -clcerts -nokeys -passin pass:"$Passphrase" | openssl x509 -outform der -out "$FileName.der"
+        }
         catch {
             Write-Error "Unable to extract CA Certificates from file $Path!"
             Break
         }
+
         Write-Verbose "Converting PFX from $Path, into a combined PEM file with Key, Certificate and CA Certificate Bundle; and writing to $Path.chain.cer"
-        try { openssl pkcs12 -in "$Path" -legacy -passin pass:"$Passphrase" -passout pass:"$Passphrase" -out "$FileName.pem" }
+        try {
+            openssl pkcs12 -in "$Path" -legacy -passin pass:"$Passphrase" -passout pass:"$Passphrase" -out "$FileName.pem"
+        }
         catch {
             Write-Error "Unable to extract CA Certificates from file $Path!"
             Break
